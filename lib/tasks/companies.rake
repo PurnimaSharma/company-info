@@ -6,15 +6,16 @@ namespace :companies do
       require 'open-uri'
     search_term = 'busiiness'
     location_term = 'United States'
-    string = doc.css('.pagination').text.split
+    url = "http://www.yellowpages.com/search?search_terms=#{search_term}&geo_location_terms=#{location_term}"
+	doc = Nokogiri::HTML(open(url))
+    string = doc.css('.pagination').text.split.last
     string = string[0...string.index("results")]
-    pages = 1...(string.to_i / 30)
+    pages = 1..(string.to_d / 30.to_d).ceil
     pages .each do |page|
-	    url = "http://www.yellowpages.com/search?search_terms=#{search_term}&geo_location_terms=#{location_term}&page=#{page}"
-	    doc = Nokogiri::HTML(open(url))
+    	url = url + "&page=#{page}"
+    	doc = Nokogiri::HTML(open(url))
 	    results = doc.css(".search-results").css('.result').css('.media-thumbnail')
 	    results.each do |result|
-	    	debugger
 	      href = result.children[0].attributes["href"].to_s
 	      master_url = "http://www.yellowpages.com#{href}"
 	      doc = Nokogiri::HTML(open(master_url))
@@ -23,6 +24,7 @@ namespace :companies do
 	      phone_no = doc.css('.phone').text
 	      email = doc.css('.email-business')[0]
 	      email = email.attributes["href"].to_s.gsub('mailto:', '') if email.present?
+	      Company.create(name: name, contact_no: phone_no, email: email)
 	      puts name
 	    end
     end
