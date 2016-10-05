@@ -8,7 +8,7 @@ namespace :companies do
       states = State.all
       states.each do |state|  	
 	    search_term = 'busiiness'
-	    url = "http://www.yellowpages.com/search?search_terms=#{search_term}&geo_location_terms=#{state.name}"
+	    url = "http://www.yellowpages.com/search?search_terms=#{search_term}&geo_location_terms=#{state.name}"+"US"
 		doc = Nokogiri::HTML(open(url))
 	    string = doc.css('.pagination').text.split.last
 	    string = string[0...string.index("results")]
